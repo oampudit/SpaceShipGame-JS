@@ -1,0 +1,189 @@
+<html>
+  <head>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var rocketShip = document.createElement('img');
+        rocketShip.src =
+          'https://i1.sndcdn.com/artworks-j8xjG7zc1wmTeO7b-O6l83w-t500x500.jpg';
+        document.body.appendChild(rocketShip);
+
+        rocketShip.style.width = '100px';
+
+        rocketShip.style.borderRadius = '100px';
+
+        rocketShip.style.position = 'absolute';
+        rocketShip.style.left = '0px';
+        rocketShip.style.top = '50%';
+        rocketShip.style.marginTop = '-50px';
+
+        var rocketShipTop = parseInt(rocketShip.style.top);
+        var rocketShipLeft = 0;
+        var rocketShipDirection = 1;
+        var rocketShipSpeed = 10;
+        var rocketShipInterval = setInterval(function () {
+          rocketShipLeft += rocketShipDirection * rocketShipSpeed;
+          if (rocketShipLeft < 0) {
+            rocketShipLeft = 0;
+            rocketShipDirection = 1;
+          } else if (rocketShipLeft > window.innerWidth - 100) {
+            rocketShipLeft = window.innerWidth - 100;
+            rocketShipDirection = -1;
+          }
+          rocketShip.style.left = rocketShipLeft + 'px';
+        }, 10);
+
+        rocketShipSpeed = 2;
+
+        document.body.style.overflow = 'hidden';
+
+        document.body.style.backgroundColor = '#000';
+
+        rocketShip.addEventListener('click', function () {
+          var firingThrusters = document.createElement('div');
+          firingThrusters.innerHTML = 'Firing thrusters!';
+          firingThrusters.style.position = 'absolute';
+          firingThrusters.style.left = rocketShipLeft + 'px';
+          firingThrusters.style.top = rocketShip.style.top;
+          firingThrusters.style.color = '#fff';
+          document.body.appendChild(firingThrusters);
+          setTimeout(function () {
+            document.body.removeChild(firingThrusters);
+          }, 250);
+          rocketShipSpeed *= 4;
+          setTimeout(function () {
+            rocketShipSpeed /= 4;
+          }, 250);
+        });
+
+        var asteroid = document.createElement('img');
+        asteroid.src =
+          'https://d.newsweek.com/en/full/1721338/asteroid.jpg?w=1600&h=1600&q=88&f=9d82d35c9de96a82b3fcaf7705eb325b';
+        document.body.appendChild(asteroid);
+
+        asteroid.style.width = '75px';
+        asteroid.style.height = '75px';
+
+        asteroid.style.borderRadius = '75px';
+
+        asteroid.style.position = 'absolute';
+        asteroid.style.left = Math.random() * (window.innerWidth - 75) + 'px';
+        asteroid.style.top = Math.random() * (window.innerHeight - 75) + 'px';
+
+        var asteroidLeft = parseInt(asteroid.style.left);
+        var asteroidTop = parseInt(asteroid.style.top);
+        var asteroidDirectionX = Math.random() < 0.5 ? -1 : 1;
+        var asteroidDirectionY = Math.random() < 0.5 ? -1 : 1;
+        var asteroidSpeed = 10;
+        var asteroidInterval = setInterval(function () {
+          asteroidLeft += asteroidDirectionX * asteroidSpeed;
+          asteroidTop += asteroidDirectionY * asteroidSpeed;
+          if (asteroidLeft < 0) {
+            asteroidLeft = 0;
+            asteroidDirectionX = 1;
+          } else if (asteroidLeft > window.innerWidth - 75) {
+            asteroidLeft = window.innerWidth - 75;
+            asteroidDirectionX = -1;
+          }
+          if (asteroidTop < 0) {
+            asteroidTop = 0;
+            asteroidDirectionY = 1;
+          } else if (asteroidTop > window.innerHeight - 75) {
+            asteroidTop = window.innerHeight - 75;
+            asteroidDirectionY = -1;
+          }
+          asteroid.style.left = asteroidLeft + 'px';
+          asteroid.style.top = asteroidTop + 'px';
+        }, 10);
+
+        asteroidSpeed = rocketShipSpeed * 1.1;
+
+        var score = 0;
+        var scoreDisplay = document.createElement('div');
+        scoreDisplay.style.position = 'absolute';
+        scoreDisplay.style.right = '0px';
+        scoreDisplay.style.top = '0px';
+        scoreDisplay.style.color = '#fff';
+        scoreDisplay.innerHTML = 'Score: ' + score;
+        document.body.appendChild(scoreDisplay);
+
+        scoreDisplay.style.fontSize = '20px';
+
+        var scoreInterval = setInterval(function () {
+          score++;
+          scoreDisplay.innerHTML = 'Score: ' + score;
+        }, 500);
+
+        var asteroidOverlappingShip = false;
+
+        var asteroidOverlappingShipLastTime = false;
+        var overlapInterval = setInterval(function () {
+          asteroidOverlappingShip =
+            Math.abs(rocketShipLeft - asteroidLeft) < 75 &&
+            Math.abs((rocketShipTop = asteroidTop)) > 75;
+        }, 10);
+
+        var collisionInterval = setInterval(function () {
+          if (asteroidOverlappingShip && !asteroidOverlappingShipLastTime) {
+            score -= 5;
+            scoreDisplay.innerHTML = 'Score: ' + score;
+            var collisionMessage = document.createElement('div');
+            collisionMessage.innerHTML = 'Collision! -5';
+            collisionMessage.style.position = 'absolute';
+            collisionMessage.style.left = asteroidLeft + 'px';
+            collisionMessage.style.top = asteroidTop + 'px';
+            collisionMessage.style.color = '#f00';
+            document.body.appendChild(collisionMessage);
+            setTimeout(function () {
+              document.body.removeChild(collisionMessage);
+            }, 250);
+          }
+          asteroidOverlappingShipLastTime = asteroidOverlappingShip;
+        }, 10);
+
+        var startTime = new Date();
+        var playerWon = false;
+
+        var winInterval = setInterval(function () {
+          if (score >= 250 && !playerWon) {
+            playerWon = true;
+            clearInterval(rocketShipInterval);
+            clearInterval(asteroidInterval);
+            clearInterval(scoreInterval);
+            clearInterval(overlapInterval);
+            clearInterval(collisionInterval);
+            clearInterval(winInterval);
+            while (document.body.firstChild) {
+              document.body.removeChild(document.body.firstChild);
+            }
+            var winMessage = document.createElement('div');
+            winMessage.innerHTML =
+              'You won! It took you ' +
+              Math.round((new Date() - startTime) / 1000) +
+              ' seconds.';
+            winMessage.style.color = '#0f0';
+            document.body.appendChild(winMessage);
+          }
+        }, 10);
+
+        var rules = document.createElement('div');
+        rules.innerHTML =
+          'Rules : Click the rocketship to fire thrusters. Avoid the asteroid. Win by reaching 250 points.';
+        rules.style.position = 'absolute';
+        rules.style.left = '0px';
+        rules.style.bottom = '0px';
+        rules.style.fontSize = '30px';
+        rules.style.color = '#ccc';
+        document.body.appendChild(rules);
+
+        var gameName = document.createElement('div');
+        gameName.innerHTML = 'Game Name';
+        gameName.style.position = 'absolute';
+        gameName.style.left = '0px';
+        gameName.style.top = '0px';
+        gameName.style.fontSize = '30px';
+        gameName.style.color = '#ccc';
+        document.body.appendChild(gameName);
+      });
+    </script>
+  </head>
+</html>
