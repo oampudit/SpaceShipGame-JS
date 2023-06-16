@@ -1,3 +1,3 @@
 # SpaceShipGame-JS
 
-[Edit on StackBlitz ⚡️](https://stackblitz.com/edit/js-yukyir)
+[Open Web Example](https://1224059.playcode.io/)
